@@ -398,6 +398,14 @@ To skip checking and displaying specific providers (even when their keys are con
 
 Hidden providers are never probed and are omitted from the startup report, widget, and footer.
 
+To skip the automatic startup report and background checks without setting an environment variable (the env var `PI_USAGE_PROACTIVE` still takes precedence):
+
+```json
+{ "proactive": false }
+```
+
+Use `/usage` to check manually.
+
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `PI_USAGE_REFRESH_MIN` | `30` | Network usage-check interval in minutes; recent passive provider/quota signals defer matching auto checks unless cached windows have expired |
