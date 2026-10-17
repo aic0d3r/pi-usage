@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 jobs:
   sync:
@@ -16,21 +17,36 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Merge upstream into sync branch and open PR
+      - name: Merge latest upstream release and open PR
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
           git remote add upstream https://github.com/mtrojnar/pi-usage.git
-          git fetch upstream main
+          git fetch upstream main --tags
           git push -f origin upstream/main:refs/heads/upstream-main
-          if git merge-base --is-ancestor upstream/main origin/main; then echo "up to date"; exit 0; fi
-          git checkout -B sync/upstream origin/main
-          if ! git merge --no-edit upstream/main; then
-            echo "Merge conflict: resolve manually"; git merge --abort; exit 1
+
+          TAG=$(gh api repos/mtrojnar/pi-usage/releases/latest --jq .tag_name)
+          if git merge-base --is-ancestor "$TAG" origin/main; then echo "up to date with $TAG"; exit 0; fi
+          if [ -n "$(gh pr list --head sync/upstream --state open --json number --jq '.[]')" ]; then
+            echo "sync PR already open"; exit 0
           fi
+
+          git checkout -B sync/upstream origin/main
+          if ! git merge --no-edit "$TAG"; then
+            # Only package metadata may conflict (our name/version); anything else needs a human.
+            OTHER=$(git diff --name-only --diff-filter=U | grep -vx -e package.json -e package-lock.json || true)
+            if [ -n "$OTHER" ]; then echo "Conflicts need manual resolution: $OTHER"; git merge --abort; exit 1; fi
+            git checkout --theirs package.json package-lock.json
+          fi
+          UPSTREAM_VERSION=$(git show "$TAG:package.json" | node -p 'JSON.parse(require("fs").readFileSync(0,"utf8")).version')
+          node .github/fork-fixup.cjs "$UPSTREAM_VERSION"
+          git add -A
+          git commit -m "Merge upstream $TAG" || true
+
           git push -f origin sync/upstream
-          gh pr list --head sync/upstream --state open --json number --jq length | grep -q '^0$' \
-            && gh pr create --base main --head sync/upstream \
-              --title "Sync upstream mtrojnar/pi-usage" --body "Automated upstream merge. Run CI and check pi version compatibility before merging." || true
+          gh pr create --base main --head sync/upstream \
+            --title "Sync upstream $TAG" \
+            --body "Automated merge of upstream release $TAG. CI was dispatched on this branch; check it and pi compatibility before merging."
+          gh workflow run ci.yml --ref sync/upstream
