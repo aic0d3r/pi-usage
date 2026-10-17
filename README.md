@@ -1,4 +1,10 @@
-# pi-usage
+# pi-usage-plus
+
+> **pi-usage-plus** is a fork of [mtrojnar/pi-usage](https://github.com/mtrojnar/pi-usage), kept in sync with upstream and current pi versions. It adds:
+> - `hideProviders` in `pi-usage.json` to skip chosen providers (upstream PR #4)
+> - `"proactive": false` in `pi-usage.json` to silence the startup usage report and background checks (no env var needed)
+>
+> Install: `pi install git:github.com/aic0d3r/pi-usage-plus`
 
 Usage limit checker extension for [pi coding agent](https://github.com/badlogic/pi-mono) — shows **Codex**, **Anthropic Claude**, **GitHub Copilot**, **OpenCode Go/Zen**, **OpenRouter** accounting, and other compatible subscription limits at startup so you know your limits before you start coding. Persistent widget is opt-in.
 
