@@ -1,6 +1,6 @@
 {
-  "name": "@mtrojnar/pi-usage",
-  "version": "0.2.0",
+  "name": "pi-usage-plus",
+  "version": "0.2.0-plus.1",
   "description": "Usage, rate-limit, and spending monitor for pi coding agent: Codex, Claude, Copilot, OpenCode, and OpenRouter daily spend, key budgets, and account credits.",
   "license": "MIT",
   "author": "timm-u and Michał Trojnara",
@@ -52,11 +52,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/mtrojnar/pi-usage.git"
+    "url": "https://github.com/aic0d3r/pi-usage-plus.git"
   },
-  "homepage": "https://github.com/mtrojnar/pi-usage",
+  "homepage": "https://github.com/aic0d3r/pi-usage-plus",
   "bugs": {
-    "url": "https://github.com/mtrojnar/pi-usage/issues"
+    "url": "https://github.com/aic0d3r/pi-usage-plus/issues"
   },
   "engines": {
     "node": ">=22.19.0"

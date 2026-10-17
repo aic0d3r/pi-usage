@@ -81,14 +81,14 @@ Requires pi **v0.85.0 or newer**.
 ### Via pi install from npm (recommended)
 
 ```bash
-pi install npm:@mtrojnar/pi-usage
+pi install git:github.com/aic0d3r/pi-usage-plus
 ```
 
 Or add to your `settings.json`:
 
 ```json
 {
-  "packages": ["npm:@mtrojnar/pi-usage"]
+  "packages": ["git:github.com/aic0d3r/pi-usage-plus"]
 }
 ```
 
