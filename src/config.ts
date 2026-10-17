@@ -29,7 +29,8 @@ export const AUTO_REFRESH_MINUTES = parseEnvInt("PI_USAGE_REFRESH_MIN", 30);
 export const UI_REFRESH_SECONDS = parseEnvInt("PI_USAGE_UI_REFRESH_SEC", 60);
 /** Minimum interval between proactive refreshes triggered by expired quota windows. */
 export const EXPIRED_REFRESH_DEBOUNCE_MS = parseEnvInt("PI_USAGE_EXPIRED_REFRESH_DEBOUNCE_SEC", 300) * 1000;
-export const PROACTIVE_REFRESH_ENABLED = parseEnvBool("PI_USAGE_PROACTIVE", true);
+// Local patch: pi-usage.json {"proactive": false} replaces the env var; env still wins.
+export const PROACTIVE_REFRESH_ENABLED = parseEnvBool("PI_USAGE_PROACTIVE", parseBoolSetting(readJsonObject(usageConfigPath())?.proactive) ?? true);
 export const CODEX_RESPONSE_REFRESH_ENABLED = parseEnvBool("PI_USAGE_CODEX_RESPONSE_REFRESH", PROACTIVE_REFRESH_ENABLED);
 export const CODEX_RESPONSE_REFRESH_SECONDS = parseEnvInt("PI_USAGE_CODEX_RESPONSE_REFRESH_SEC", 60);
 
@@ -105,6 +106,12 @@ export function readUsageWidgetSetting(ctx?: UsageContext): boolean | undefined 
 		if (projectValue !== undefined) value = projectValue;
 	}
 	return value;
+}
+
+/** Provider ids listed in pi-usage.json "hideProviders" are never checked or shown. */
+export function readHiddenProviders(): Set<string> {
+	const raw = readJsonObject(usageConfigPath())?.hideProviders;
+	return new Set(Array.isArray(raw) ? raw.filter((v): v is string => typeof v === "string") : []);
 }
 
 export function dedupe(list: string[]): string[] {
